@@ -16,9 +16,8 @@ public class PlayerController : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
-       rig.velocity = mobileJoystick.GetMoveVector() * moveSpeed * Time.deltaTime; 
+        rig.velocity = mobileJoystick.GetMoveVector() * moveSpeed * Time.deltaTime; 
     }
 }
