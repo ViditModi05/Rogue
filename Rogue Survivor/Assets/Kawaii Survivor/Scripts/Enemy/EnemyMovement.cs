@@ -7,28 +7,25 @@ public class EnemyMovement : MonoBehaviour
 {
     [Header("References")]
     private Player player;
-
+    
     [Header("Settings")]
     [SerializeField] private float moveSpeed;
-    // Start is called before the first frame update
-    void Start()
+   
+    public void StorePlayer(Player player)
     {
-        player = FindFirstObjectByType<Player>();
-
-        if(player == null)
-        {
-            Debug.LogWarning("No player found");
-            Destroy(gameObject);
-        }
-        
+        this.player = player;
     }
-
-    // Update is called once per frame
     void Update()
+    {  
+        if(player != null)
+        {
+           FollowPlayer(); 
+        } 
+    }
+    private void FollowPlayer()
     {
         Vector2 direction = (player.transform.position - transform.position).normalized;   //Getting the direction for the enemy to move in by normalizing
         Vector2 targetPosition = (Vector2)transform.position + direction * moveSpeed * Time.deltaTime; //getting the target position for the enemy
         transform.position = targetPosition; //Setting the target position to the enemy
-
     }
 }
