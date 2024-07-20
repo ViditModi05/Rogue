@@ -1,9 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField] private Slider healthSlider;
+    [SerializeField] private TextMeshProUGUI healthText;
     [Header("Settings")]
     [SerializeField] private int maxHealth;
     private int health;
@@ -11,18 +17,15 @@ public class PlayerHealth : MonoBehaviour
     void Start()
     {
         health = maxHealth;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        UpdateUI();
     }
 
     public void TakeDamage(int damage)
     {
         int realDamage = Mathf.Min(damage , health);
         health -= realDamage;
+
+        UpdateUI();
 
         if(health <= 0)
         {
@@ -33,5 +36,13 @@ public class PlayerHealth : MonoBehaviour
     private void Dead()
     {
         Debug.Log("Game Over");
+        SceneManager.LoadScene(0);
+    }
+
+    private void UpdateUI()
+    {
+        float healthBarValue = (float)health/maxHealth;
+        healthSlider.value = healthBarValue;
+        healthText.text = health + " / " + maxHealth;
     }
 }
