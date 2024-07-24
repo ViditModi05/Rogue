@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
 {
     [Header("References")]
     private PlayerHealth playerHealth;
-
+    [SerializeField] private CircleCollider2D collider;
     private void Awake()
     {
         playerHealth = GetComponent<PlayerHealth>();
@@ -29,5 +29,10 @@ public class Player : MonoBehaviour
     {
         playerHealth.TakeDamage(damage);
         
+    }
+
+    public Vector2 GetCenter()
+    {
+        return (Vector2)transform.position + collider.offset; 
     }
 }

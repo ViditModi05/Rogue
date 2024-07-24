@@ -1,16 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Video;
-using TMPro;
 using System;
 
-[RequireComponent(typeof(EnemyMovement))]
-public class Enemy : MonoBehaviour
+[RequireComponent(typeof(EnemyMovement), typeof(RangeEnemyAttack))]
+public class RangeEnemy : MonoBehaviour
 {
+
     [Header("References")]
     private Player player;
     private EnemyMovement movement; 
+    private RangeEnemyAttack attack;
 
     [Header("Health")]
     [SerializeField] private int maxHealth;
@@ -26,24 +26,22 @@ public class Enemy : MonoBehaviour
     [SerializeField] private ParticleSystem deathParticles;
 
     [Header("Attack")]
-    [SerializeField] private int damage;
-    [SerializeField] private float attackFrequency;
-     [SerializeField] private float playerDetectionRadius;
-    private float attackDelay;
-    private float attackTimer;
+    [SerializeField] private float playerDetectionRadius;
 
     [Header("Actions")]
     public static Action<int, Vector2> onDamageTaken;
 
     [Header("Debug")]
     [SerializeField] private bool gizmos;
-
+    
     // Start is called before the first frame update
     void Start()
     {
         health = maxHealth;
         movement = GetComponent<EnemyMovement>();
+        attack = GetComponent<RangeEnemyAttack>();
         player = FindFirstObjectByType<Player>();
+        attack.StorePlayer(player);
 
         if(player == null)
         {
@@ -51,10 +49,8 @@ public class Enemy : MonoBehaviour
             Destroy(gameObject);
         }
         
-       StartSpawnSequence();
-       attackDelay = 1f / attackFrequency ;
+       StartSpawnSequence();        
     }
-
     private void StartSpawnSequence()
     {
         SetRendererVisibilty(false);
@@ -79,26 +75,10 @@ public class Enemy : MonoBehaviour
         Erenderer.enabled = visibility;
         spawnIndicator.enabled = !visibility;
     }
-
-
-    private void Wait()
-    {
-        attackTimer += Time.deltaTime;
-    }
-
-    private void Attack()
-    {
-        attackTimer = 0;
-        player.TakeDamage(damage);    
-    }
     private void TryAttack()
     {
-        float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
+        attack.AutoAim();
 
-        if(distanceToPlayer <= playerDetectionRadius)
-        {
-            Attack();
-        }
     }
     private void Death()
     {
@@ -110,23 +90,26 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       if(!Erenderer.enabled)
+        if(!Erenderer.enabled)
          {
-            return;
-        }
-        
-       movement.FollowPlayer();
-        
-       if(attackTimer >= attackDelay)        
-       {
-         TryAttack();  
-       }
-       else
-       {
-         Wait();
-       }
+             return;
+         }
 
-        
+        ManageAttack();  
+    }
+
+    private void ManageAttack()
+    {
+        float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
+        if(distanceToPlayer > playerDetectionRadius)
+        {
+            movement.FollowPlayer();
+        }
+        else
+        {
+            TryAttack();
+        }
+
     }
     private void OnDrawGizmos()
     {

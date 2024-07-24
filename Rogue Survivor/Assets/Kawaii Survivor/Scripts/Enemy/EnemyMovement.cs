@@ -17,12 +17,12 @@ public class EnemyMovement : MonoBehaviour
     }
     void Update()
     {  
-        if(player != null)
-        {
-           FollowPlayer(); 
-        } 
+        // if(player != null)
+        // {
+        //    FollowPlayer(); 
+        // } 
     }
-    private void FollowPlayer()
+    public void FollowPlayer()
     {
         Vector2 direction = (player.transform.position - transform.position).normalized;   //Getting the direction for the enemy to move in by normalizing
         Vector2 targetPosition = (Vector2)transform.position + direction * moveSpeed * Time.deltaTime; //getting the target position for the enemy

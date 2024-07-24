@@ -17,7 +17,7 @@ public class Weapon : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private Transform hitDetectionTransform;
-    
+    [SerializeField] private BoxCollider2D hitCollider;
     
     [Header("Settings")]
     [SerializeField] private float range;
@@ -80,7 +80,12 @@ public class Weapon : MonoBehaviour
 
     private void Attack()
     {
-        Collider2D[] enemies = Physics2D.OverlapCircleAll(hitDetectionTransform.position, range, enemyMask);
+       //Collider2D[] enemies = Physics2D.OverlapCircleAll(hitDetectionTransform.position, range, enemyMask);
+        Collider2D[] enemies = Physics2D.OverlapBoxAll(hitDetectionTransform.position, 
+        hitCollider.bounds.size, 
+        hitDetectionTransform.localEulerAngles.z,
+        enemyMask);
+
         for(int i = 0; i < enemies.Length; i++)
         {
             Enemy enemy = enemies[i].GetComponent<Enemy>();
@@ -97,7 +102,7 @@ public class Weapon : MonoBehaviour
     private Enemy GetClosestEnemy()
     {
         Enemy closestEnemy = null;
-        Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, hitDetectionRadius, enemyMask);
+        Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, range, enemyMask);
 
         if(enemies.Length <= 0)
         {
@@ -127,8 +132,9 @@ public class Weapon : MonoBehaviour
         Vector2 targetUpVector = Vector3.up;
         if(closestEnemy != null)
         {
-            ManageAttack();
             targetUpVector = (closestEnemy.transform.position - transform.position).normalized;
+            transform.up = targetUpVector;
+            ManageAttack();
         }
         transform.up = Vector3.Lerp(transform.up, targetUpVector, Time.deltaTime * aimLerp);
        IncrementAttackTimer();
